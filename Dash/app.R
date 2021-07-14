@@ -15,10 +15,6 @@ trace1 <- list(
   #group = main$Group,
   text = iris$Species
 )
-
-
-
-
 app$layout(
   htmlDiv(
     list(

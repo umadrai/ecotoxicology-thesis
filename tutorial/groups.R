@@ -3,14 +3,16 @@ library(plotly)
 library(DT)
 
 
-#ori <- datatable(orig)
+#orig[,6:7] <- round(orig[,6:7], 4)
 
 ui <- fluidPage(
   plotlyOutput('myPlot'),
   fluidRow(
     DT::dataTableOutput("res")
+  ),
+  fluidRow(
+    verbatimTextOutput("es")
   )
-  
   
 )
 
@@ -20,8 +22,15 @@ server <- function(input, output, session){
       layout(dragmode = "select")
   })
   
+  # output$es <- renderPrint({
+  #   d <- event_data("plotly_selected")
+  #   a <- subset(orig, (orig$DIM_1 %in% d$x & orig$DIM_2 %in% d$y))
+  #   a
+  # })
+  
   output$res <- renderDataTable({
     d <- event_data("plotly_selected")
+    #browser()
     a <- subset(orig, (orig$DIM_1 %in% d$x & orig$DIM_2 %in% d$y))
     a
   })

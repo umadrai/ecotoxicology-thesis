@@ -17,16 +17,17 @@ ui <- fluidPage(
 )
 
 server <- function(input, output, session){
+  
+  
   output$myPlot = renderPlotly({
     plot_ly(data = orig, x = orig$DIM_1, y = orig$DIM_2, color = groups) %>%
       layout(dragmode = "select")
   })
   
-  # output$es <- renderPrint({
-  #   d <- event_data("plotly_selected")
-  #   a <- subset(orig, (orig$DIM_1 %in% d$x & orig$DIM_2 %in% d$y))
-  #   a
-  # })
+  output$es <- renderPrint({
+    d <- event_data("plotly_selected")
+    d
+  })
   
   output$res <- renderDataTable({
     d <- event_data("plotly_selected")

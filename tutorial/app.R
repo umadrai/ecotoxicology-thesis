@@ -11,9 +11,8 @@ library(shiny)
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
-
-    # Application title
-    titlePanel("Old Faithful Geyser Data"),
+    title = "Trying Shiny App",
+    h1("TSNE plot"),
 
     # Sidebar with a slider input for number of bins 
     sidebarLayout(
@@ -27,7 +26,7 @@ ui <- fluidPage(
 
         # Show a plot of the generated distribution
         mainPanel(
-           plotOutput("distPlot")
+           plotOutput("scatterPlot")
         )
     )
 )
@@ -35,7 +34,7 @@ ui <- fluidPage(
 # Define server logic required to draw a histogram
 server <- function(input, output) {
 
-    output$distPlot <- renderPlot({
+    output$scatterPlot <- renderPlot({
         # generate bins based on input$bins from ui.R
         x    <- faithful[, 2]
         bins <- seq(min(x), max(x), length.out = input$bins + 1)

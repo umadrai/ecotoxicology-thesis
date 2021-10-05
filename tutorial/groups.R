@@ -3,7 +3,7 @@ library(plotly)
 library(DT)
 
 
-#orig[,6:7] <- round(orig[,6:7], 4)
+orig[,6:7] <- round(orig[,6:7], 4)
 
 ui <- fluidPage(
   plotlyOutput('myPlot'),
@@ -20,7 +20,7 @@ server <- function(input, output, session){
   
   
   output$myPlot = renderPlotly({
-    plot_ly(data = orig, x = orig$DIM_1, y = orig$DIM_2, color = groups) %>%
+    plot_ly(data = orig, x = orig$`1`, y = orig$`2`, color = groups) %>%
       layout(dragmode = "select")
   })
   
@@ -32,7 +32,7 @@ server <- function(input, output, session){
   output$res <- renderDataTable({
     d <- event_data("plotly_selected")
     #browser()
-    a <- subset(orig, (orig$DIM_1 %in% d$x & orig$DIM_2 %in% d$y))
+    a <- subset(orig, (orig$`1` %in% d$x & orig$`2` %in% d$y))
     a
   })
 }

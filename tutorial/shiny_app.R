@@ -25,10 +25,10 @@ server <- function(input, output, session){
     a <- subset(iris, (iris$Sepal.Length %in% d$x & iris$Petal.Length %in% d$y))
     a
   })
-  output$es <- renderPrint({
-    d <- event_data("plotly_selected")
-    d
-  })
+  # output$es <- renderPrint({
+  #   d <- event_data("plotly_selected")
+  #   d
+  # })
   
 }
 

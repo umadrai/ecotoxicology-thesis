@@ -85,25 +85,28 @@ fps_matrix <- function(fplist, sp){
 
 #################
 #### Reading all the groups files 
-read_file <- openxlsx::read.xlsx(xlsxFile = "C:\\Users\\uulhassa\\Desktop\\URai\\Zet o Map\\Matthias\\zet-o-map_chem_space_fps.xlsx", 1, header = TRUE)
+read_file <- openxlsx::read.xlsx(xlsxFile = "C:\\Users\\uulhassa\\Desktop\\URai\\Zet o Map\\Matthias\\zet-o-map_chem_space_fps.xlsx", 1)
 
 #column_names <- names(read_file)
 #column_names
 
 #EXTRACTING columns which will be used
-use_df <- read_file %>% select(contains(c("id", "smiles")))
-names(use_df)[length(use_df)] <- "SMILES"
+use_df <- read_file %>% select(contains(c("id", "smiles", "Sources")))
+#names(use_df)[length(use_df)] <- "SMILES"
 
+
+## Fingerprints List which needs to be added.
+## MAACS, Morgan, Atom-pairs and Atom
 
 
 #Elements with no SMILES
-no_smiles <- use_df[which(is.na(use_df$SMILES)),]
+no_smiles <- use_df[which(is.na(use_df$smiles)),]
 
 #Without NAs.
-main <- filter(use_df,!is.na(use_df$SMILES))
+main <- filter(use_df,!is.na(use_df$smiles))
 
 #### Fingerprints Amino
-mols_d <- parse.smiles(main$SMILES,omit.nulls = TRUE)
+mols_d <- parse.smiles(main$smiles,omit.nulls = TRUE)
 
 # Getting NULL smiles, will be 0 when omit.nulls = TRUE
 null_mols <- Filter(is.null, mols_d)
@@ -125,75 +128,14 @@ smiles_list <- strsplit(alls, " ")
 expanded_fps <- as.data.frame(fps_matrix(fps_final, smiles_list))
 
 #Change name of last column so it can be used in join
-names(expanded_fps)[length(names(expanded_fps))] <- "SMILES"
-
-################################### 
-# ####Fingerprints Ether
-# mols_d <- parse.smiles(ether[,5])
-# fps_ether <- lapply(mols_d, get.fingerprint, type = "maccs", fp.mode = "bit")
-# #Get smiles from s4 objects and create a list of smiles.
-# alls <- (attributes(fps_ether))$names
-# sp_ethers <- strsplit(alls, " ")
-# ether_expanded <- as.data.frame(fps_matrix(fps_ether, sp_ethers))
-# #Change name of last column so it can be used in join
-# names(ether_expanded)[length(names(ether_expanded))] <- "Smiles"
-# 
-# 
-# ####Fingerprints Alcohol
-# mols_d <- parse.smiles(alcohol[,5],omit.nulls = TRUE)
-# fps_alcohol <- lapply(mols_d, get.fingerprint, type = "maccs", fp.mode = "bit")
-# #alcohol_expanded <- fp.to.matrix(fps_alcohol)
-# #Get smiles from s4 objects and create a list of smiles.
-# alls <- (attributes(fps_alcohol))$names
-# sp_alcohol <- strsplit(alls, " ")
-# amino_expanded <- as.data.frame(fps_matrix(fps_alcohol, sp_alcohol))
-# #Change name of last column so it can be used in join
-# names(alcohol_expanded)[length(names(alcohol_expanded))] <- "Smiles"
-# 
-# ####Fingerprints phthalates
-# mols_d <- parse.smiles(phthalates[,5])
-# fps_phthalates <- lapply(mols_d, get.fingerprint, type = "maccs", fp.mode = "bit")
-# #phthalates_expanded <- fp.to.matrix(fps_phthalates)
-# #Get smiles from s4 objects and create a list of smiles.
-# alls <- (attributes(fps_phthalates))$names
-# sp_pthalates <- strsplit(alls, " ")
-# phthalates_expanded <- as.data.frame(fps_matrix(fps_phthalates, sp_pthalates))
-# #Change name of last column so it can be used in join
-# names(phthalates_expanded)[length(names(phthalates_expanded))] <- "Smiles"
-# 
-# ####Fingerprints alkz_phenols
-# mols_d <- parse.smiles(alky_phenols[,5])
-# fps_aphenols <- lapply(mols_d, get.fingerprint, type = "maccs", fp.mode = "bit")
-# #aphenols_expanded <- fp.to.matrix(fps_aphenols)
-# #Get smiles from s4 objects and create a list of smiles.
-# alls <- (attributes(fps_aphenols))$names
-# sp_phenols <- strsplit(alls, " ")
-# aphenols_expanded <- as.data.frame(fps_matrix(fps_aphenols, sp_phenols))
-# #Change name of last column so it can be used in join
-# names(aphenols_expanded)[length(names(aphenols_expanded))] <- "Smiles"
-# 
-# ##### Concatenating the main and fingerprint matrix
-# amino <- cbind(amino, amino_expanded)
-# ether <- cbind(ether, ether_expanded)
-# alcohol <- cbind(alcohol, alcohol_expanded)
-# phthalates <- cbind(phthalates, phthalates_expanded)
-# alky_phenols <- cbind(alky_phenols, aphenols_expanded)
-
-
-### Concatenate all row wise
-#main <- rbind(amino, ether)
-#main <- rbind(main, alcohol)
-#main <- rbind(main, phthalates)
-#main <- rbind(main, alky_phenols)
-#main <- rbind.data.frame( alky_phenols, phthalates ,amino,  alcohol, ether)
-
+names(expanded_fps)[length(names(expanded_fps))] <- "smiles"
 
 ##############
 
 #Inner join removes null parsed smiles from resulted joined DF as
 #expanded_fps only has parsed smiles matrix values.
 
-joined <- inner_join(main, expanded_fps, by = "SMILES", copy = FALSE)
+joined <- inner_join(main, expanded_fps, by = "smiles", copy = FALSE)
 
 #### To get index of V1 column
 col_index <- which(colnames(joined) == "V1")
@@ -208,8 +150,9 @@ joined[, col_index: length(joined)] <- normalise_mm(joined[, col_index: length(j
 
 #Duplicattes
 dup <- duplicated(joined)
-joined <- joined[!duplicated(joined$SMILES),]
+joined <- joined[!duplicated(joined$smiles),]
 
+#groups <- as.factor(use_df$)
 #TSNE
 set.seed(42)
 tsne.res <- Rtsne(joined, perplexity = 30, check_duplicates = FALSE, pca = FALSE, verbose = TRUE)

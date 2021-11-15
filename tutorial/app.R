@@ -17,31 +17,47 @@ ui <- fluidPage(
     # Sidebar with a slider input for number of bins 
     sidebarLayout(
         sidebarPanel(
-            sliderInput("perplexity",
-                        "Perplexity:",
-                        min = 1,
-                        max = 50,
-                        value = 30)
+            selectInput("fps",
+                        "Select Type of fingerprint:",
+                        choices = list("a", "b", "c"),
+                        selected = NULL,
+                        multiple = FALSE,
+                        selectize = TRUE,
+                        width = NULL,
+                        size = NULL
+                        )
         ),
 
         # Show a plot of the generated distribution
         mainPanel(
-           plotOutput("scatterPlot")
+            plotlyOutput('myPlot'),
+            fluidRow(
+                DT::dataTableOutput("res")
+                ),
+            fluidRow(
+                verbatimTextOutput("es")
+                )
         )
     )
 )
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
-
-    output$scatterPlot <- renderPlot({
-        # generate bins based on input$bins from ui.R
-        x    <- faithful[, 2]
-        bins <- seq(min(x), max(x), length.out = input$bins + 1)
-
-        # draw the histogram with the specified number of bins
-        hist(x, breaks = bins, col = 'darkgray', border = 'white')
+    output$myPlot = renderPlotly({
+        plot_ly(data = iris, x = ~Sepal.Length, y = ~Petal.Length, color = ~Species) %>%
+            layout(dragmode = "select")
     })
+    
+    output$res <- renderDataTable({
+        d <- event_data("plotly_selected")
+        a <- subset(iris, (iris$Sepal.Length %in% d$x & iris$Petal.Length %in% d$y))
+        a
+    })
+    # output$es <- renderPrint({
+    #   d <- event_data("plotly_selected")
+    #   d
+    # })
+   
 }
 
 # Run the application 

@@ -100,7 +100,7 @@ special <- c("64175", "5436431", "1746016", "50328",
              "80057", "79947", "51525","84742", "1763231",
              "45298906", "375735", "57465288", "302794", "7784465",
              "17804352", "137304", "7440439", "67747095", "60571",
-             "75912", "6051872", "129000", "87865", "7440224") 
+             "75912", "6051872", "129000", "87865", "7440224")
 
 
 #Missing blue colored CAS.
@@ -122,7 +122,7 @@ ggplotly(g)
 
 #Generating PCA
 res <- prcomp(sub_group[3:168])
-fviz_pca_ind(res, col.ind = "cos2", label="none", habillage=sub_group$group, addEllipses=TRUE, ellipse.level=0.5)
+res <- fviz_pca_ind(res, col.ind = "cos2", label="none", habillage=sub_group$group, addEllipses=TRUE, ellipse.level=0.5)
 
 #Smiles which were not parsed filtering so can be written to xlsx file.
 sp_smiles <- filter(zeto2,zeto2$smile %in% null_sp)

@@ -40,49 +40,6 @@ fps_matrix <- function(fplist, sp){
   
 }
 
-###################################################
-# tsne_dc <- Rtsne(d_c[,15:180], perplexity = 50, check_duplicates = FALSE, pca = TRUE, verbose = TRUE)
-# s <- factor(d_c[,13])
-# s
-# 
-# par(mfrow=c(1,1)) # To plot two images side-by-side
-# #plot(tsne_dc$Y, col = "blue", pch = 19, cex = 1.5) # Plotting the first image
-# plot(tsne_dc$Y, col = "black", bg= (s), pch = 21, cex = 1.5)
-# levels(IR_species)
-# 
-# tsne_dc$Y
-# is.data.frame(tsne_dc$Y)
-# 
-# c <- as.data.frame(tsne_dc$Y)
-# c
-# 
-# info.norm = tibble(Compound = s)
-# 
-# info.norm %<>% mutate(DIM_1 = tsne_dc$Y[, 1], DIM_2 = tsne_dc$Y[,2])
-# 
-# ggplot(info.norm, aes(x = DIM_1, y = DIM_2, colour = Compound)) + 
-#   geom_point(alpha = 0.8) + theme_bw()
-# 
-# 
-# 
-# ###PCa 
-# pca.norm = prcomp(d_c[, 15:180])
-# pca.norm$x
-# pca.norm$scale
-# info.norm %<>% cbind(pca.norm$x[, 1:166])
-# ggplot(info.norm, aes(x = PC1, y = PC2, colour = Compound)) + 
-#   geom_point(alpha = 0.8) + theme_bw()
-# 
-# summary(pca.norm)
-# 
-# 
-# #### Kaggle
-# # visualizing
-# colors = rainbow(length(unique(d_c$source)))
-# names(colors) = unique(d_c$source)
-# plot(tsne_dc$Y, t='n', main="tsne")
-# text(tsne_dc$Y, labels=d_c$source, col=colors[d_c$source])
-
 #################
 #### Reading all the groups files 
 read_file <- openxlsx::read.xlsx(xlsxFile = "C:\\Users\\uulhassa\\Desktop\\URai\\Zet o Map\\Matthias\\zet-o-map_chem_space_fps.xlsx", 1)
@@ -118,8 +75,29 @@ null_sp <- strsplit(null_all, " ")
 #not null
 not_null <- Filter(Negate(is.null), mols_d)
 
-# Generating maccs fps
-fps_final <- lapply(not_null, get.fingerprint, type = "maccs", fp.mode = "bit")
+#standard worked
+#maccs worked
+#extended worked
+#graph worked
+#circular worked
+#pubchem not worked
+
+# Create list of the fingerprints types
+fps_list = list("standard", "maccs", "extended", "graph", "circular", "pubchem")
+message = "Select the type of Fingerprints:
+        1: Standard
+        2: MACCS
+        3: Extended
+        4: Graph
+        5: Circular
+        6: PubChem"
+if(interactive()){
+  user_input <- readline(prompt = message)
+  type_fps <- fps_list[[as.integer(user_input)]]
+} else { type_fps <- "maccs"}
+
+# Generating Fingerprints (fps)
+fps_final <- lapply(not_null, get.fingerprint, type = "graph", fp.mode = "bit")
 
 # Get smiles from s4 objects and create a list of smiles.
 # Helps to append the smiles in fps matrix later to helps to join original and fps matrix/DF
@@ -157,7 +135,7 @@ joined <- joined[!duplicated(joined$smiles),]
 set.seed(42)
 tsne.res <- Rtsne(joined, perplexity = 30, check_duplicates = FALSE, pca = FALSE, verbose = TRUE)
 tsne_out_DF <- data.frame(x = tsne.res$Y[,1], y = tsne.res$Y[,2])
-g <- ggplot(tsne_out_DF,aes(x,y)) +  geom_point(alpha = 0.8) + theme_bw() + ggtitle("tSNE")
+g <- ggplot(tsne_out_DF,aes(x,y)) +  geom_point(alpha = 0.8) + theme_bw() + ggtitle(paste("tSNE - ", type_fps, "FPS", sep = " "))
 ggplotly(g)
 
 
@@ -166,27 +144,3 @@ ggplotly(g)
 res <- prcomp(joined[,col_index:length(joined)])
 res <- fviz_pca_ind(res, col.ind = "cos2", label="none", addEllipses=TRUE, ellipse.level=0.5)
 res
-
-#########
-# main with x,y values from tsne.
-#main <- cbind(info.norm[,2:3])
-#orig <- main[,1:5]
-#orig <- cbind(orig, info.norm[2:3])
-
-
-# For sampling (Not used for now)
-#set.seed(42)
-##############
-#### shuffle rows of df randomly to test the output on tsne
-# main2 <- joined[sample(nrow(joined)),]
-# tsne2 <- Rtsne(main2, perplexity = 30, check_duplicates = FALSE, pca = TRUE, verbose = TRUE)
-# info.norm = tibble(Compound = groups)
-# info.norm %<>% mutate(DIM_1 = tsne2$Y[, 1], DIM_2 = tsne2$Y[,2])
-# f <- ggplot(info.norm, aes(x = DIM_1, y = DIM_2, colour = Compound)) + 
-#   geom_point(alpha = 0.8) + theme_bw()
-# fig <- ggplotly(f)
-# fig
-# tsne_out_DF2 <- data.frame(x = tsne2$Y[,1], y = tsne2$Y[,2])
-# g <- ggplot(tsne_out_DF2,aes(x,y)) +  geom_point(alpha = 0.8) + theme_bw() + ggtitle("tSNE")
-# ggplotly(g)
-

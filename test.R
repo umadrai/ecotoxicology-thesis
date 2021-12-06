@@ -91,8 +91,11 @@ message = "Select the type of Fingerprints:
         4: Graph
         5: Circular
         6: PubChem"
-user_input <- readline(prompt = message)
-type_fps <- fps_list[[as.integer(user_input)]]
+if(interactive()){
+  user_input <- readline(prompt = message)
+  type_fps <- fps_list[[as.integer(user_input)]]
+}
+else { type_fps <- "maccs"}
 
 # Generating Fingerprints (fps)
 fps_final <- lapply(not_null, get.fingerprint, type = "graph", fp.mode = "bit")

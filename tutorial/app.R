@@ -23,7 +23,7 @@ ui <- fluidPage(
                         selected = NULL,
                         multiple = FALSE,
                         selectize = TRUE,
-                        width = NULL,
+                        width = 40,
                         size = NULL
                         )
         ),

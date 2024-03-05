@@ -163,3 +163,39 @@ abline(iris_fit, col = "red")
 lines(testIrisData$Sepal.Length, iris_test_90[,2], col = "blue", lty = 2)
 
 lines(testIrisData$Sepal.Length, iris_test_90[,3], col = "blue", lty = 2)
+
+
+
+#### LCEC50 Data
+
+data <- openxlsx::read.xlsx(xlsxFile = "C:\\Users\\uulhassa\\Desktop\\URai\\Final DATA\\v2\\LC_EC50_final.xlsx", 1)
+indices <- sample(1:nrow(data), 0.8*nrow(data))  # row indices for training data
+training_Data <- data[indices,]  # model training data
+#trainingIrisData <- trainingIrisData[, -c(2,4,5)]
+test_Data <- data[-indices,]
+
+fit_model <- lm(Effect ~ (Duration + mol_L), data = training_Data)
+prediction <- predict(fit_model, test_Data, interval = "confidence", level = 0.90)
+
+actual_pred <- data.frame(cbind(test_Data, pred = prediction))
+
+plot(test_Data$Duration, test_Data$mol_L, main = "Regression")
+abline(fit_model, col = "red")
+lines(test_Data$Duration, actual_pred[,10], col = "blue", lty = 2)
+
+lines(test_Data$Duration, actual_pred[,11], col = "blue", lty = 2)
+
+
+mod2 <- lm(Duration ~ mol_L, data = training_Data)
+summary(mod2)
+pred2 <- predict(mod2, test_Data, interval = "confidence", level = 0.95)
+actual_pred2 <- data.frame(cbind(test_Data, pred = pred2))
+
+plot(test_Data$Duration, test_Data$mol_L, main = "Regression")
+abline(fit_model, col = "red")
+lines(test_Data$Duration, actual_pred[,10], col = "blue", lty = 2)
+
+lines(test_Data$Duration, actual_pred[,11], col = "blue", lty = 2)
+#Try scalling y axis lock scale.
+# Split axis - enter break on axis
+#x = daphnia : y = danio
